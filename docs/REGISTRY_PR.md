@@ -1,77 +1,71 @@
 # 提交到 Lumina-Workshop-Registry 的操作手册
 
-本文件描述把 `studio.heightforge.heightmap` 上架到创意工坊的最后一段流程。
-**记录已经生成好了**，只差把占位仓库地址换成真实地址。
+本文件描述把 `studio.heightforge.heightmap` 上架到创意工坊的流程与当前状态。
 
 ## 0. 现状
 
 | 项目 | 值 |
 | --- | --- |
 | 模块 ID | `studio.heightforge.heightmap` |
-| 版本 | `1.0.0` |
-| 包文件 | `studio.heightforge.heightmap-1.3.1.lumina-workshop` |
-| 包大小 | 162,106 字节 |
-| 包 sha256 | `17e92c08a8f3dc3421697fdb8e442d2d5050e9cb47909d3b142b7a70d66c30f0` |
-| manifest sha256 | `4b305567d0593b31586436cd103e38f78c6918cec80ec887c1db849127e86f88` |
+| 当前版本 | `1.3.3` |
+| 仓库 | `https://github.com/xueseyinlang-cmyk/LUMINA-HFMAP` |
+| Release | `v1.3.3`（非 draft、非 prerelease） |
+| 包文件 | `studio.heightforge.heightmap-1.3.3.lumina-workshop` |
+| 包大小 | 219,755 字节 |
+| 包 sha256 | `24f0fde9ad26d41630878e5a0ff959304db59e4a9e7a90d241cb205006830459` |
+| manifest sha256 | `a64d2740fa9b637a3e3aed780a1199409b7cccd5263fa804b8ecb75d93080ada` |
 | 权限 | `image.pick`、`handoff.image` |
 | 兼容 | Workshop API `1.0.0 ≤ x < 2.0.0`；Lumina `≥ 2.0.0` |
+| 记录 | 已提交：Registry PR #12（追加 1.3.2 与 1.3.3），等待审核合并 |
 
-草稿记录在 `registry/draft/studio.heightforge.heightmap.json`（`repository` 仍是
-`https://github.com/OWNER/heightforge-workshop`）。
+记录文件：`registry/modules/studio.heightforge.heightmap.json`。其中 `repository` 仍是
+仓库改名前的 `https://github.com/xueseyinlang-cmyk/LUMINA-`：旧 URL 302 跳转、数字仓库 ID
+不变，按 Registry 既有做法不改（改动属于身份变更，需要单独审核）。
 
-## 1. 建仓库并发布 Release（人工，必须先做）
+## 1. 发布 Release（1.3.3 已完成，保留步骤供后续版本参考）
 
-1. 建公开仓库，把本目录推上去（`tools/`、`tests/` 可以一起推，发布包里不含它们）。
-2. 打 tag 并发布 Release：
+1. 版本号统一到 `manifest.json`、`package.json`、`ui/index.html` 的 `MODULE_VERSION`。
+2. 打包并记录哈希：
 
    ```bash
-   git tag -a v1.0.0 -m "HeightForge Height Map 1.0.0"
-   git push origin v1.0.0
+   python tools/build_package.py
+   # 产出 dist/studio.heightforge.heightmap-<version>.lumina-workshop
    ```
 
-3. Release 必须是 **非 draft、非 prerelease**，且**只挂一个**模块资产：
+3. 打 tag 并推送（本机需代理与 schannel 绕过）：
+
+   ```bash
+   git tag -a v<version> -m "studio.heightforge.heightmap <version>"
+   git -c http.schannelCheckRevoke=false -c http.proxy=http://127.0.0.1:7890 push origin v<version>
+   ```
+
+4. Release 必须**非 draft、非 prerelease**，且**只挂一个**模块资产；确认这个地址能下载（Registry 会抓两次）：
 
    ```text
-   tag:      v1.0.0
-   asset:    studio.heightforge.heightmap-1.3.1.lumina-workshop
-   checksum: studio.heightforge.heightmap-1.3.1.lumina-workshop.sha256   # 可选但建议
+   https://github.com/xueseyinlang-cmyk/LUMINA-HFMAP/releases/download/v<version>/studio.heightforge.heightmap-<version>.lumina-workshop
    ```
 
-4. 确认这个地址能下载到东西（Registry 会从这里抓两次）：
+> 资产字节必须与本地 `dist/` 一致；重新打包后摘要会变，记录要跟着重新生成。
 
-   ```text
-   https://github.com/<owner>/<repo>/releases/download/v1.3.1/studio.heightforge.heightmap-1.3.1.lumina-workshop
-   ```
-
-> 资产字节必须与本地 `dist/` 里的一致。若你重新打包过，摘要会变，记录要跟着重新生成。
-
-## 2. 生成正式记录
+## 2. 生成记录
 
 ```bash
-python tools/make_registry_record.py \
-  --repository https://github.com/<owner>/<repo> \
-  --publisher "HeightForge Studio"
+python tools/make_registry_record.py   --repository https://github.com/xueseyinlang-cmyk/LUMINA-HFMAP   --publisher "HeightForge Studio"   --package dist/studio.heightforge.heightmap-<version>.lumina-workshop
 ```
 
-成功后会写到 `registry/modules/studio.heightforge.heightmap.json`。
-脚本会自动核对：tag 与版本、资产名、字节数、两个 sha256、权限、兼容范围、
-SemVer 递增；任何一项对不上都会 `[fail]` 而不是写出文件。
+脚本会核对 tag 与版本、资产名、字节数、两个 sha256、权限、兼容范围、SemVer 递增；
+任何一项对不上都会 `[fail]` 而不是写出文件。
 
-想先看效果可以加 `--draft`（写 `registry/draft/`，不覆盖正式记录）。
+追加新版本时保留既有 `versions`：记录只追加，历史条目不可修改。
 
 ## 3. 提 PR
 
-在 `Lumina-Workshop-Registry` 仓库里新增一个文件：
+在 `Lumina-Workshop-Registry` 仓库更新 `modules/studio.heightforge.heightmap.json`：
 
-```text
-modules/studio.heightforge.heightmap.json
-```
+- 只在 `versions` 末尾追加新条目；
+- PR 正文写明版本、资产名、字节数、`sha256` / `manifestSha256`、权限是否变化、兼容范围。
 
-PR 描述建议直接给：
-
-- 模块做什么（图片 → 高度图，交给 Lumina 转换器）；
-- 申请的权限与理由（`image.pick`、`handoff.image`，无网络）；
-- 实测过的宿主范围，以及你**实际测试过**的场景（这点审核会问）。
+当前 PR：#12（1.3.2 + 1.3.3），分支 `add/studio.heightforge.heightmap-1.3.2`。
 
 ## 4. CI 与审核会检查什么（对应本记录的字段）
 
@@ -91,15 +85,13 @@ PR 描述建议直接给：
 
 ## 5. 可选：本地安装验证
 
-桌面版会把工坊模块装在：
+步骤见 `docs/LOCAL_INSTALL.md`（已按 1.3.3 更新）。桌面版会把工坊模块装在：
 
 ```text
 %APPDATA%\lumina-electron\workshop\modules\<moduleId>\<version>\
 ```
 
-把包装进该目录（现有 `lumina.bead-pattern\1.0.1` 就是样例）即可在客户端里试跑，
-**但这是写用户配置目录，必须先经用户同意**；未签名/未登记模块在正式环境可能被拒，
-只适合本地冒烟。
+这是写用户配置目录，必须先经用户同意。
 
 ## 6. 常见驳回原因（已在本仓库提前规避）
 
@@ -108,3 +100,4 @@ PR 描述建议直接给：
 - 图标带 EXIF/ICC、或不是静态 PNG → 图标生成器与校验器都会拦。
 - 资产重新上传导致字节变化 → 构建固定时间戳/权限/顺序，两次构建 sha256 一致。
 - 记录里的摘要与资产不符 → 记录由脚本从 `dist/` 现场计算，不手抄。
+- 许可证不完整 → 1.3.3 起包内 LICENSE 保留 MIT，并附 SDK（GPL-3.0-or-later）声明与完整 GPLv3。

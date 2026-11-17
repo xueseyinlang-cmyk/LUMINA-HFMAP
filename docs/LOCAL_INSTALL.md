@@ -1,4 +1,4 @@
-# 真机安装验证（需你确认后才执行）
+# 真机安装验证（1.3.3）
 
 这一步会写入用户配置目录 `%APPDATA%\lumina-electron\workshop\`，因此**没有执行**，
 下面是完整步骤、预期结果与回滚办法。你确认后我按此执行。
@@ -38,9 +38,9 @@
    ```bash
    python - <<'PY'
    import zipfile, pathlib
-   dest = pathlib.Path(r"%APPDATA%\lumina-electron\workshop\modules\studio.heightforge.heightmap\1.0.0")
+   dest = pathlib.Path(r"%APPDATA%\lumina-electron\workshop\modules\studio.heightforge.heightmap\1.3.3")
    dest.mkdir(parents=True, exist_ok=True)
-   with zipfile.ZipFile(r"D:\DSH\heightforge-workshop\dist\studio.heightforge.heightmap-1.3.1.lumina-workshop") as z:
+   with zipfile.ZipFile(r"D:\DSH\heightforge-workshop\dist\studio.heightforge.heightmap-1.3.3.lumina-workshop") as z:
        z.extractall(dest)
    print("extracted ->", dest)
    PY
@@ -49,10 +49,10 @@
 3. **在 `install-state.json` 的 `modules` 数组里追加一条**（保持 JSON 合法）：
 
    ```json
-   {"active_version":null,"candidate_version":"1.0.0","consecutive_start_failures":0,
+   {"active_version":null,"candidate_version":"1.3.3","consecutive_start_failures":0,
     "enabled":true,"module_id":"studio.heightforge.heightmap","official":false,
     "official_uninstalled":false,"previous_version":null,"source":"local",
-    "source_repository":"https://github.com/<owner>/<repo>","versions":["1.0.0"]}
+    "source_repository":"https://github.com/<owner>/<repo>","versions":["1.3.3"]}
    ```
 
    > `source` 的取值我是**按 `seed` 推测**的（`local` / `catalog` 两种都可能），
@@ -70,7 +70,7 @@
 | 交给 Lumina | 转换器里出现高度图，可继续生成 | `handoff.image` 参数不符（如必须 8 位 PNG / 必须带 svgBytes） |
 
 浏览器内已验证过的部分（不依赖宿主）：界面渲染、映射管线、16 位 PNG 导出，见
-`docs/ui_module.png` 与 `python tools/run_js_tests.py` 的 27 例结果。
+`docs/ui_module.png` 与 `python tools/run_js_tests.py` 的 90 例结果。
 
 ## 回滚
 
@@ -88,7 +88,7 @@ PR 描述里已经如实标注了“尚未在真机宿主验证”。
 
 ---
 
-## 实测结果（2026-11-02，已完成）
+## 实测结果（2026-11-02，1.0.0 时期；包结构与 1.3.3 相同）
 
 环境：Lumina Studio 2.0.0-beta（`versions/9c90c988…`），Windows 11 `10.0.26100`。
 
@@ -128,3 +128,20 @@ cp "$APPDATA/lumina-electron/workshop/install-state.json.bak-<时间戳>" \
 ```
 
 （本次安装前的备份：`install-state.json.bak-20261102-002113`。）
+
+## 1.3.3 安装（当前版本）
+
+包：~B~studio.heightforge.heightmap-1.3.3.lumina-workshop~B~（219,755 字节）
+sha256：~B~24f0fde9ad26d41630878e5a0ff959304db59e4a9e7a90d241cb205006830459~B~
+
+优先用客户端自带的安装接口（与工坊页面同一条链路）：
+
+```text
+POST /api/workshop/v1/install/local      (multipart, field=archive)  → 200 ok
+POST /api/workshop/v1/modules/studio.heightforge.heightmap/activate   → 200 ok
+GET  /api/workshop/v1/modules                                          → source=local, active=1.3.3
+```
+
+也可以从 Release 下载后手工解包到
+~B~%APPDATA%\lumina-electron\workshop\modules\studio.heightforge.heightmap\1.3.3\~B~，
+并按上面的回滚办法先备份 ~B~install-state.json~B~。
