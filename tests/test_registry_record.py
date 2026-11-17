@@ -71,7 +71,7 @@ def main() -> int:
     ok &= expect_fail("版本倒序", lambda r: r["versions"].append({**copy.deepcopy(v(r)), "version": "0.9.0",
                                                                   "releaseTag": "v0.9.0"}))
     # 下一个补丁版本要从记录的当前版本算出来，否则记录版本一升测试就失效
-    _maj, _min, _pat = (int(x) for x in v(BASE)["version"].split("."))
+    _maj, _min, _pat = (int(x) for x in BASE["versions"][-1]["version"].split("."))
     _next = f"{_maj}.{_min}.{_pat + 1}"
     ok &= expect_ok("第二个更高版本", lambda r: r["versions"].append({
         **copy.deepcopy(v(r)), "version": _next, "releaseTag": "v" + _next,
