@@ -49,6 +49,14 @@ node tools/bundle_sdk.mjs   # 把 SDK 内联进 ui/index.html（模块运行时�
 SDK 的 `connectWorkshop()` 负责握手（`lumina.workshop.ready` → `lumina.workshop.connect` + `MessagePort`）、
 RPC 封装与超时/帧校验；模块侧只调用 `client.image.pick()`、`client.handoff.image()`、`client.lifecycle.ready()`。
 
+## 许可证 / License
+
+本模块自身源代码为 **MIT**（见 `LICENSE` 开头的 MIT 条款）。发布包在构建期把官方
+`@lumina/workshop-sdk` 1.0.2（**GPL-3.0-or-later**）内联进 `ui/index.html`，因此
+`LICENSE` 同时包含 MIT 条款、SDK 的版权/许可声明，以及 GNU GPLv3 的完整文本
+（GPLv3 第 4-6 条要求随目标代码分发提供许可文本）。SDK 的来源、Release 资产与
+SHA-256 校验值见 `LICENSE` 的「许可证与第三方组件说明」一节。
+
 ## 构建 / Build
 
 ```bash
@@ -61,6 +69,7 @@ python tests/test_registry_record.py
 
 ## 版本 / Version
 
+1.3.3 — 许可证合规：LICENSE 保留 MIT，补充内联 SDK（GPL-3.0-or-later）的版权/许可声明与完整 GPLv3 文本，包内随附。
 1.2.0 — 对齐 HeightForge 1.3.1 的映射与导出能力；Workshop API `1.0.0` / Manifest `1`。
 1.3.2 — 立体浮雕 WebGL 预览成为默认预览（可旋转/缩放），参数面板按用户任务重排并加欢迎页，修两个预览窗格视图切换不生效；SDK 固定消费 1.0.2 的 Release URL。
 1.3.1 — 修四个验收问题：首次出图即可交接、已有图片时二次确认替换、宿主内收起无效导出并说明、台阶化后 Gamma/对比真正不参与且状态同步。
